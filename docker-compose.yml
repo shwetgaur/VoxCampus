@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra_db
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_LISTEN_ADDRESS=cassandra
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=cassandra
+      - CASSANDRA_START_RPC=true
+    networks:
+      - app_network
+
+  django:
+    build: .  # If Dockerfile is inside the 'backend' folder
+    container_name: django_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - cassandra
+    volumes:
+      - ./backend:/app
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
